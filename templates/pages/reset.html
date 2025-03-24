@@ -1,0 +1,39 @@
+{% load static %}
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Reset Your Password - UniHub</title>
+    <link rel="stylesheet"href="{% static 'css/reset.css' %}">
+    
+</head>
+<body>
+    <div class="container">
+        <h1 class="fancy-title">UniHub</h1>
+        <h2>Reset Your Password</h2>
+        <p>Please enter your email address. You will receive a link to create a new password via email.</p>
+        <form id="resetPasswordForm">
+            <div class="form-group">
+                <label for="email">Email Address</label>
+                <input type="email" id="email" name="email" placeholder="name@example.com" required>
+            </div>
+            <button type="submit" class="send-btn">Send</button>
+        </form>
+        <p class="signin-link">Remember your password? <a href="login.html">Log In</a></p>
+    </div>
+
+    <script>
+        // وظيفة لإرسال الفورم (يمكنك تعديلها لإرسال البيانات إلى الخادم)
+        document.getElementById('resetPasswordForm').addEventListener('submit', function(event) {
+            event.preventDefault();
+            const email = document.getElementById('email').value;
+
+            // هنا يمكنك إضافة كود لإرسال البيانات إلى الخادم
+            console.log('Email:', email);
+            alert('تم إرسال رابط إعادة تعيين كلمة المرور إلى بريدك الإلكتروني!');
+        });
+    </script>
+</body>
+</html>

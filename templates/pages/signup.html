@@ -1,0 +1,103 @@
+{% load static %}
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sign Up to UniHub</title>
+    <link rel="stylesheet" href="{% static 'css/sign.css' %}">
+</head>
+<body>
+    <div class="container">
+        <h1 class="fancy-title">Sign up to UniHub</h1>
+        <form method="post" action="{% url 'profile' %}">
+              {% csrf_token %}
+            <div class="form-group">
+                <label for="profileName">Profile Name</label>
+                <input type="text" id="profileName" name="profileName" placeholder="Enter your profile name" required>
+            </div>
+            <div class="form-group">
+                <label for="email">Email Address</label>
+                <input type="email" id="email" name="email" placeholder="Enter your email address" required>
+            </div>
+            <div class="form-group">
+                <label for="password">Password</label>
+                <input type="password" id="password" name="password" placeholder="Enter your password" required>
+                <small>Use 8 or more characters with a mix of letters, numbers & symbols</small>
+            </div>
+            <div class="form-group">
+                <label>What’s your gender? (optional)</label>
+                <div class="gender-options">
+                    <label><input type="radio" name="gender" value="female"> Female</label>
+                    <label><input type="radio" name="gender" value="male"> Male</label>
+                    <label><input type="radio" name="gender" value="non-binary"> Non-binary</label>
+                </div>
+            </div>
+            <div class="form-group">
+                <label>What’s your date of birth?</label>
+                <div class="dob-fields">
+                    <select id="month" name="month" required>
+                        <option value="">Month</option>
+                        <option value="1">January</option>
+                        <option value="2">February</option>
+                        <option value="3">March</option>
+                        <option value="4">April</option>
+                        <option value="5">May</option>
+                        <option value="6">June</option>
+                        <option value="7">July</option>
+                        <option value="8">August</option>
+                        <option value="9">September</option>
+                        <option value="10">October</option>
+                        <option value="11">November</option>
+                        <option value="12">December</option>
+                    </select>
+
+                    <select id="date" name="date" required>
+                        <option value="">Date</option>
+                        <!-- سيتم إضافة الأيام من 1 إلى 31 باستخدام JavaScript -->
+                    </select>
+                    <select id="year" name="year" required>
+                        <option value="">Year</option>
+                        <!-- سيتم إضافة السنوات من 1900 إلى 2023 باستخدام JavaScript -->
+                    </select>
+
+                </div>
+            </div>
+            <div class="form-group">
+                <label>
+                    <input type="checkbox" name="terms" required> Accept Terms of use and Privacy Policy
+                </label>
+            </div>
+            <button type="submit" class="register-btn">Register</button>
+        </form>
+        <p>Already have an account? <a href="{% url 'login' %}">Log in</a></p>
+    </div>
+
+
+    <script>
+        // JavaScript لإضافة الأيام والسنوات ديناميكيًا
+        const dateSelect = document.getElementById('date');
+        const yearSelect = document.getElementById('year');
+
+        // إضافة الأيام من 1 إلى 31
+        for (let i = 1; i <= 31; i++) {
+            const option = document.createElement('option');
+            option.value = i;
+            option.textContent = i;
+            dateSelect.appendChild(option);
+        }
+
+        // إضافة السنوات من 1900 إلى 2023
+        const currentYear = new Date().getFullYear();
+        for (let i = currentYear; i >= 1900; i--) {
+            const option = document.createElement('option');
+            option.value = i;
+            option.textContent = i;
+            yearSelect.appendChild(option);
+        }
+    </script>
+
+
+</body>
+</html>

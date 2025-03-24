@@ -1,0 +1,91 @@
+{%load static%}
+
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>UniHub Dashboard</title>
+    <link rel="stylesheet" href="{% static 'css/Dashboard.css' %}">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+</head>
+<body>
+    <div class="dashboard">
+        <!-- Navbar -->
+        <nav class="navbar">
+            <button class="menu-btn" id="menuBtn"><i class="fas fa-bars"></i></button>
+            <h1>UniHub</h1>
+            <div class="search-bar">
+                <input type="text" placeholder="Search...">
+                <i class="fas fa-search"></i>
+            </div>
+            <div class="navbar-icons">
+                <div class="notifications">
+                    <i class="fas fa-bell" id="notificationsIcon"></i>
+                    <div class="notifications-dropdown" id="notificationsDropdown">
+                        <ul>
+                            <li>New message from Felix</li>
+                            <li>Course update available</li>
+                            <li>Reminder: Assignment due tomorrow</li>
+                        </ul>
+                    </div>
+                </div>
+                <img src="./-2xmyv4.jpg" alt="Profile" class="profile-pic">
+            </div>
+        </nav>
+
+        <!-- Sidebar -->
+        <div class="sidebar" id="sidebar">
+            <div class="logo">
+                <h1>UniHub</h1>
+                <button class="close-btn" id="closeBtn">&times;</button>
+            </div>
+            <ul class="sidebar-menu">
+                <li><a href="#" class="active"><i class="fas fa-home"></i> Dashboard</a></li>
+                <li><a href="#"><i class="fas fa-book"></i> Courses</a></li>
+                <li><a href="#"><i class="fas fa-bell"></i> Activity</a></li>
+                <li><a href="#"><i class="fas fa-cog"></i> Settings</a></li>
+                <li><a href="#"><i class="fas fa-sign-out-alt"></i> Log Out</a></li>
+            </ul>
+        </div>
+
+        <!-- Main Content -->
+
+  
+
+    <script>
+        // JavaScript لفتح وإغلاق الشريط الجانبي
+        const sidebar = document.getElementById('sidebar');
+        const menuBtn = document.getElementById('menuBtn');
+        const closeBtn = document.getElementById('closeBtn');
+        const mainContent = document.getElementById('mainContent');
+
+        menuBtn.addEventListener('click', () => {
+            sidebar.classList.toggle('active');
+            mainContent.classList.toggle('active');
+        });
+
+        closeBtn.addEventListener('click', () => {
+            sidebar.classList.remove('active');
+            mainContent.classList.remove('active');
+        });
+
+        // JavaScript لإظهار وإخفاء قائمة الإشعارات
+        const notificationsIcon = document.getElementById('notificationsIcon');
+        const notificationsDropdown = document.getElementById('notificationsDropdown');
+
+        notificationsIcon.addEventListener('click', () => {
+            notificationsDropdown.classList.toggle('show');
+        });
+
+        // إغلاق قائمة الإشعارات عند النقر خارجها
+        document.addEventListener('click', (event) => {
+            if (!notificationsIcon.contains(event.target)) {
+                notificationsDropdown.classList.remove('show');
+            }
+        });
+    </script>
+</body>
+</html>
