@@ -1,103 +1,174 @@
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.decorators import login_required
-from .models import Student, Course, Board, Post, Reply, Notification, Announcement
+from .models import *
 from .forms import *
 from django.db.models import Q
-
+from django.contrib.auth import login as auth_login
+from django.shortcuts import render, redirect
+from django.contrib.auth import login
+from .forms import SignUpForm, StudentProfileForm
+from django.shortcuts import render, get_object_or_404
+from django.contrib.auth.decorators import login_required
+from .models import *
 
 def home(request):
     return render(request, 'base.html')
 
 def signup(request):
     if request.method == 'POST':
-        form = SignupForm(request.POST, request.FILES)
+        form = SignUpForm(request.POST)
         if form.is_valid():
-            user = form.save(commit=False)  # تأخير الحفظ
-            user.gender = form.cleaned_data['gender']  # تخصيص الحقول
-            user.date_of_birth = form.cleaned_data['date_of_birth']
-            user.save()  # الحفظ بعد التخصيص
-            login(request, user)
-            return redirect('profile')
+            user = form.save()
+            auth_login(request, user)
+            return redirect('complete_profile')
     else:
-        form = SignupForm()
+        form = SignUpForm()
     return render(request, 'pages/signup.html', {'form': form})
 
+from django.views.decorators.csrf import csrf_exempt
 
 
 
 @login_required
-def profile(request):
-    return render(request, 'pages/completeProfile.html')
+def complete_profile(request):
+    if request.method == 'POST':
+        form = StudentProfileForm(request.POST, request.FILES)
+        if form.is_valid():
+            profile = form.save(commit=False)
+            profile.user = request.user
+            profile.save()
+            form.save_m2m()  # لحفظ علاقات ManyToMany
+            return redirect('dashboard')
+    else:
+        form = StudentProfileForm()
+    return render(request, 'pages/completeProfile.html', {'form': form})
+
+
+
+from django.contrib.auth import authenticate, login
+from django.shortcuts import render, redirect
+
+from django.contrib.auth import authenticate, login
+from django.shortcuts import render, redirect
 
 def login(request):
     if request.method == 'POST':
-        username = request.POST['username']
-        password = request.POST['password']
-
-        data =loginForm(username=username,password=password)
-        data.save()
-        user = authenticate(request, username=username, password=password)
-        if user is not None:
+        email = request.POST.get('email')
+        password = request.POST.get('password')
+        user = authenticate(request, username=email, password=password)
+        if user:
             login(request, user)
-            return redirect('dashboard')
+            return redirect('dashboard')  # توجيه المستخدم عند نجاح تسجيل الدخول
         else:
-            return render(request, 'login.html', {'error': 'Invalid credentials'})
-    return render(request, 'pages/login.html')
+            return render(request, 'pages/login.html', {
+                'form': StudentLoginForm(),
+                'error': 'Invalid email or password.'
+            })
+    else:
+        return render(request, 'pages/login.html', {'form': StudentLoginForm()})
+
+
+
+
+import logging
+from django.contrib.auth import authenticate, login
+from django.shortcuts import render, redirect
+from django.contrib import messages
+
+# إعداد نظام تسجيل الأخطاء
+logger = logging.getLogger(__name__)
+
+# def login_view(request):
+#     if request.method == 'POST':
+#         form = LoginForm(request.POST)
+#         if form.is_valid():
+#             email = form.cleaned_data['email']
+#             password = form.cleaned_data['password']
+            
+#             # طباعة البيانات المُدخلة للتأكد من صحتها
+#             logger.debug(f"Email entered: {email}, Password entered: {password}")
+
+#             user = authenticate(request, username=email, password=password)
+            
+#             if user is not None:
+#                 logger.debug("User authenticated successfully.")
+#                 login(request, user)
+#                 return redirect('dashboard')
+#             else:
+#                 logger.warning("Authentication failed. Invalid email or password.")
+#                 messages.error(request, 'Invalid email or password.')
+#         else:
+#             logger.warning("Form validation failed. Errors: %s", form.errors)
+#     else:
+#         form = LoginForm()
+    
+#     return render(request, 'pages/login.html', {'form': form})
+
+
+
+def login_view(request):
+    if request.method == 'POST':
+        form = LoginForm(request.POST)
+        if form.is_valid():
+            email = form.cleaned_data['email']
+            password = form.cleaned_data['password']
+            
+            logger.debug(f"Email entered: {email}, Password entered: {password}")
+
+            try:
+                user = User.objects.get(email=email)
+                if user.check_password(password):
+                    login(request, user)
+                    logger.debug("User authenticated successfully.")
+                    return redirect('dashboard')
+                else:
+                    logger.warning("Authentication failed. Invalid email or password.")
+                    messages.error(request, 'Invalid email or password.')
+            except User.DoesNotExist:
+                logger.warning("User with this email does not exist.")
+                messages.error(request, 'Invalid email or password.')
+        else:
+            logger.warning("Form validation failed. Errors: %s", form.errors)
+    else:
+        form = LoginForm()
+    
+    return render(request, 'pages/login.html', {'form': form})
 
 @login_required
 def logout(request):
     logout(request)
     return redirect('home')
 
-# @login_required
-# def dashboard(request):
-#     student = Student.objects.get(user=request.user)
-#     courses = student.courses.all()
-#     boards = Board.objects.filter(course__in=courses)
-#     posts = Post.objects.filter(board__in=boards)
-#     return render(request, 'pages/Dashboard.html', {'student': student, 'courses': courses, 'boards': boards, 'posts': posts})
-
-
+from django.shortcuts import render
+from django.contrib.auth.decorators import login_required
 
 @login_required
 def dashboard(request):
-    # جلب الطالب المرتبط بالمستخدم الحالي مباشرة
-    student = Student.objects.get(user=request.user)
-    # جلب الدورة المرتبطة بالطالب (إذا كانت واحدة)
-    course = student.courses.first()  # يمكن استخدام .first() للحصول على أول دورة فقط
-    # جلب المجموعات المرتبطة بالدورة
-    boards = Board.objects.filter(course=course)
-    # جلب المشاركات المرتبطة بالمجموعات
-    posts = Post.objects.filter(board__in=boards)
+    try:
+        # محاولة جلب ملف الطالب
+        student = StudentProfile.objects.get(user=request.user)
+        courses = student.courses.all()
+        profile_picture = student.profile_picture.url if student.profile_picture else None
+        boards = Board.objects.filter(course__in=courses)
+        posts = Post.objects.filter(board__in=boards)
+    except StudentProfile.DoesNotExist:
+        # إذا لم يتم العثور على ملف الطالب، عرض قيم فارغة
+        student = None
+        courses = []
+        boards = []
+        posts = []
 
+    # عرض القالب مع القيم سواء كانت موجودة أو فارغة
     return render(request, 'pages/Dashboard.html', {
         'student': student,
-        'course': course,
+        'courses': courses,
         'boards': boards,
         'posts': posts,
     })
 
-    try:
-        # الحصول على الطالب المرتبط بالمستخدم الحالي
-        student = get_object_or_404(Student, user=request.user)
-        # جلب جميع الدورات المرتبطة بالطالب
-        courses = student.courses
-        # جلب جميع المجموعات المرتبطة بالدورات
-        boards = Board.objects.filter(course__in=courses)
-        # جلب جميع المشاركات المرتبطة بالمجموعات
-        posts = Post.objects.filter(board__in=boards)
 
-        # عرض البيانات في الصفحة
-        return render(request, 'pages/Dashboard.html', {
-            'student': student,
-            'courses': courses,
-            'boards': boards,
-            'posts': posts
-        })
-    except Exception as e:
-        # معالجة الأخطاء غير المتوقعة
-        return render(request, 'pages/Error.html', {'error': str(e)})
+
 
 @login_required
 def create_post(request, board_id):

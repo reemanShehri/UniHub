@@ -32,10 +32,11 @@
                         </ul>
                     </div>
                 </div>
-                <img src="./-2xmyv4.jpg" alt="Profile" class="profile-pic">
-            </div>
-        </nav>
 
+                <img src="{{ student.profile_picture.url }}" alt="Profile" class="profile-pic">            </div>
+        </nav>
+        <!-- User Details -->
+        <div class="user-details">
         <!-- Sidebar -->
         <div class="sidebar" id="sidebar">
             <div class="logo">
@@ -54,26 +55,28 @@
         <!-- Main Content -->
         <div class="main-content" id="mainContent">
             <header>
-                <h2>Hello, John</h2>
-                <p>Welcome back!</p>
+                <h2>Hello, {{ user.username }}</h2>
+                <p>Welcome back, {{ user.email }}student!</p>
             </header>
+            
 
             <!-- Cards Section -->
             <div class="cards">
                 <div class="card">
                
-           
-                    <h3>MY COURSES</h3>
-                    <p>5 Active Courses</p>
-                </div>
-                <div class="card">
-                    <h3>ACTIVITY</h3>
-                    <p>3 New Notifications</p>
-                </div>
-                <div class="card">
-                    <h3>SETTINGS</h3>
-                    <p>Update Profile</p>
-                </div>
+                    <div class="courses">
+                        <h2>MY COURSES</h2>
+                        {% for course in courses %}
+                        <div class="course-item">
+                            <p>{{ course.name }} - {{ course.code }}</p>
+                            <div class="details">
+                                <span>{{ course.university.name }}</span>
+                                <p>{{ course.description }}</p>
+                            </div>
+                        </div>
+                        {% endfor %}
+                    </div>
+                    
             </div>
 
             <!-- Activity Section -->
@@ -104,16 +107,12 @@
             <div class="settings">
                 <h2>Settings</h2>
                 <div class="settings-item">
-                    <p>Egestas elit dui scelerisque ut eu purus aliquam vitae habitasse.</p>
-                    <div class="details">
-                        <span>Jane Doe</span>
-                        <p>Lorem ipsum</p>
-                    </div>
+                    <p><strong>University:</strong> {{ student.university.name }}</p>
+                    <p><strong>Major:</strong> {{ student.major }}</p>
+                    <p><strong>Academic Level:</strong> {{ student.academic_level }}</p>
                 </div>
-                <div class="settings-item">
-                    <p>Egestas elit dui scelerisque ut eu purus aliquam vitae habitasse.</p>
-        </div>
-    </div>
+            </div>
+        </div>            
 
     <script>
         // JavaScript لفتح وإغلاق الشريط الجانبي

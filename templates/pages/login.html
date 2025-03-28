@@ -7,24 +7,35 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Log in to UniHub</title>
     <link rel="stylesheet" href="{% static 'css/login.css' %}">
-    
-  {% comment %} <link href="./login.css" rel="stylesheet"> {% endcomment %}
 </head>
 <body>
     <div class="container">
         <h1 class="fancy-title">Log in to your UniHub account</h1>
-        <form id="loginForm" method="post" action="{% url 'login' %}">            <div class="form-group">
+        <form id="loginForm" method="post" action="{% url 'login' %}">
             {% csrf_token %}
-             <label for="email">Email address</label>
+            <div class="form-group">
+                <label for="email">Email address</label>
                 <input type="email" id="email" name="email" placeholder="name@example.com" required>
+                {% if form.email.errors %}
+                    <p class="error-message">{{ form.email.errors.0 }}</p>
+                {% endif %}
             </div>
             <div class="form-group">
                 <label for="password">Password</label>
+                {% if messages %}
+                    <script>
+                        {% for message in messages %}
+                            alert("{{ message }}");
+                        {% endfor %}
+                    </script>
+                {% endif %}
                 <div class="password-wrapper">
                     <input type="password" id="password" name="password" placeholder="Your password" required>
                     <button type="button" class="toggle-password" onclick="togglePasswordVisibility()">Hide</button>
                 </div>
-                <!-- <p class="error-message">Error message: Exhaust - what password?</p> -->
+                {% if form.password.errors %}
+                    <p class="error-message">{{ form.password.errors.0 }}</p>
+                {% endif %}
             </div>
             <div class="form-group">
                 <label>
@@ -32,19 +43,11 @@
                 </label>
             </div>
             <button type="submit" class="login-btn">Log in</button>
-            {% if error %}
-            <p class="error-message">{{ error }}</p>
-        {% endif %}
-        
         </form>
-        {% comment %} <p class="forgot-password-link"><a href="{% url 'reset' %}">Forgot your password?</a></p> {% endcomment %}
         <p class="signup-link">Don't have an account? <a href="{% url 'signup' %}">Sign up</a></p>
-        {% comment %} <p class="signup-link">done<a href="./completeProfile.html">Sign up</a></p> {% endcomment %}
-
     </div>
 
     <script>
-        // وظيفة لإظهار أو إخفاء كلمة المرور
         function togglePasswordVisibility() {
             const passwordInput = document.getElementById('password');
             const toggleButton = document.querySelector('.toggle-password');
@@ -54,21 +57,9 @@
                 toggleButton.textContent = 'Hide';
             } else {
                 passwordInput.type = 'password';
-                toggleButton.textContent = 'show';
+                toggleButton.textContent = 'Show';
             }
         }
-
-        // وظيفة لإرسال الفورم (يمكنك تعديلها لإرسال البيانات إلى الخادم)
-        document.getElementById('loginForm').addEventListener('submit', function(event) {
-            event.preventDefault();
-            const email = document.getElementById('email').value;
-            const password = document.getElementById('password').value;
-
-            // هنا يمكنك إضافة كود لإرسال البيانات إلى الخادم
-            console.log('Email:', email);
-            console.log('Password:', password);
-            alert('تم تسجيل الدخول بنجاح!');
-        });
     </script>
 </body>
 </html>
